@@ -3,28 +3,43 @@
 namespace App\Entity;
 
 use App\Repository\AuthorRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
-class Author implements UserInterface, PasswordAuthenticatedUserInterface
+class Author implements UserInterface, PasswordAuthenticatedUserInterface // Сущность должна называться "User"
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 180, unique: true)]
     private ?string $username = null;
-    #[ORM\Column(length: 100)]
-    private $lastname = null;
-    #[ORM\Column(length: 120)]
-    private $surname = null;
-    #[ORM\Column]
+
+    #[ORM\Column(type: Types::STRING, length: 100)]
+    private ?string $lastname = null;
+
+    #[ORM\Column(type: Types::STRING, length: 120)]
+    private ?string $surname = null;
+
+    #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
-    #[ORM\Column(length: 254)]
+
+    #[ORM\Column(type: TYPES::STRING, length: 254)]
     private ?string $email;
+
+    #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'authors', cascade: ['persist'])]
+    private Collection $books;
+
+    public function __construct()
+    {
+        $this->books = new ArrayCollection();
+    }
 
     /**
      * @var string The hashed password
@@ -142,5 +157,20 @@ class Author implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function addBook(Book $book): self
+    {
+        if (!$this->getBooks()->contains($book)) {
+            $this->getBooks()->add($book);
+            $book->addAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function getBooks(): Collection
+    {
+        return $this->books;
     }
 }
