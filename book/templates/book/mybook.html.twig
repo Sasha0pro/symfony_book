@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MainController!{% endblock %}
+
+{% block body %}
+    <style>
+        .main{
+            float: right;
+        }
+
+    </style>
+    <header>
+        <a href="/newbook">new book</a>
+        <a class = "main" href="/main">main</a>
+    </header>
+    <main>
+        {% for mybooks in mybook %}
+            <div class="book"><a href="/book/content?id={{ mybooks.getId() }}">
+                    {{ mybooks.getTitle() }}</a><br>
+                <a href="/book/edit?id={{ mybooks.getId() }}">edit</a><br>
+                <a href="/book/delete?id={{ mybooks.getId() }}">delete</a>
+            </div>
+        {% endfor %}
+    </main>
+{% endblock %}

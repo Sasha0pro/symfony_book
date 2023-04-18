@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MainController!{% endblock %}
+
+{% block body %}
+    <form action="/book/edit?id={{id}}&edit=true" method="post">
+        <textarea name="content" class="form-control">{{ content }}</textarea>
+        <button type="submit" class="btn btn-primary">save</button>
+    </form>
+{% endblock %}
